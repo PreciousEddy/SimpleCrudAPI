@@ -16,4 +16,4 @@
       ``` 
 
 - [x] ## Run the server with:
-    ` uvivorn main:app -- reload `
+    ` uvicorn main:app -- reload `

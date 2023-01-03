@@ -1,5 +1,10 @@
 from fastapi import FastAPI
+import mysql.connector
 
+
+
+mydb = mysql.connector.connect(host="localhost",user="root",password="",database="python")
+mycursor = mydb.cursor()
 
 app = FastAPI()
 
@@ -20,31 +25,41 @@ async def root():
 # get all movies
 @app.get("/movies")
 def get_movies():
+    sql = "SELECT * FROM movies"
+    mycursor.execute(sql)
+    movies = mycursor.fetchall()
     return movies
 
 #get single movie
 @app.get("/movie/{movie_id}")
 def get_movie(movie_id:int):
-    return movies[movie_id]
-
-#Deleting a movie
-@app.delete("/movie/{movie_id}")
-def delete_movie(movie_id:int):
-    movies.pop(movie_id) #pop is used to delete items ina n array
-    return {"message":" Movie has been deleted succesfully👍"}
-
+    sql = "SELECT * FROM movies WHERE id = %s"
+    val = (movie_id,)
+    mycursor.execute(sql,val)
+    movie = mycursor.fetchall()
+    return movie[0]
 
 #creating a new movie
 @app.post("/create_movie")
 def create_movie(movie:dict):
-    movies.append(movie)# append functions inserts a data at the end of the array
-    return movies[-1]
+    sql = "INSERT INTO movies (title,Year,storyline) VALUES (%s,%s,%s)"
+    val = (movie['title'],movie['Year'],movie['storyline'])
+    mycursor.execute(sql,val)
+    mydb.commit()
+    return movie
 
 #updating a movie (renaming or fixing the year of an existing movie)
 @app.post("/update_movie")
 def update_movies(movie_id:int,movie:dict):
     movie_to_be_updated = movies[movie_id] # get movie to be updated
     movie_to_be_updated['title'] = movie['title'] # update title
-    movie_to_be_updated['year'] = movie['year'] # update year
+    movie_to_be_updated['Year'] = movie['Year'] # update year
     movies[movie_id] = movie_to_be_updated # movie updated successfully
     return movie_to_be_updated
+
+    #Deleting a movie
+@app.delete("/movie/{movie_id}")
+def delete_movie(movie_id:int):
+    movies.pop(movie_id) #pop is used to delete items ina n array
+    return {"message":" Movie has been deleted succesfully👍"}
+ 
