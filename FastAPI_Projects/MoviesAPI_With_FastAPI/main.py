@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 import mysql.connector
+from fastapi.openapi.models import Response
+from pydantic import BaseModel
 
 
 
@@ -50,16 +52,26 @@ def create_movie(movie:dict):
 
 #updating a movie (renaming or fixing the year of an existing movie)
 @app.post("/update_movie")
-def update_movies(movie_id:int,movie:dict):
-    movie_to_be_updated = movies[movie_id] # get movie to be updated
-    movie_to_be_updated['title'] = movie['title'] # update title
-    movie_to_be_updated['Year'] = movie['Year'] # update year
-    movies[movie_id] = movie_to_be_updated # movie updated successfully
-    return movie_to_be_updated
+def update_movies(movie:dict):
+    sql = "UPDATE movies SET title = %s , Year = %s, storyline = %s WHERE id = %s"
+    val = (movie['title'],movie['Year'],movie['storyline'], movie['id'])
+    mycursor.execute(sql,val)
+    mydb.commit()
+    return movie
+
+   # movie_to_be_updated = movies[movie_id] # get movie to be updated
+   # movie_to_be_updated['title'] = movie['title'] # update title
+   # movie_to_be_updated['Year'] = movie['Year'] # update year
+   # movies[movie_id] = movie_to_be_updated # movie updated successfully
+   # return movie_to_be_updated
 
     #Deleting a movie
 @app.delete("/movie/{movie_id}")
 def delete_movie(movie_id:int):
-    movies.pop(movie_id) #pop is used to delete items ina n array
+    sql = "DELETE FROM movies WHERE id = %s"
+    val = (movie_id,)
+    mycursor.execute(sql,val)
+    mydb.commit()
+    # movies.pop(movie_id) #pop is used to delete items ina n array
     return {"message":" Movie has been deleted succesfully👍"}
  
