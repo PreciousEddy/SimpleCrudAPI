@@ -2,6 +2,8 @@ from fastapi import FastAPI
 import mysql.connector
 from fastapi.openapi.models import Response
 from pydantic import BaseModel
+from Movies import Movie
+from typing import Optional
 
 
 
@@ -11,29 +13,37 @@ mycursor = mydb.cursor()
 app = FastAPI()
 
 
-movies = [{"title":"","Year":0},
-         {"title":"Batman","Year":2021},
-         {"title":"Joker","Year":2022},
-         {"title":"Lion King","Year":1999},
-         {"title":"Snow White","Year":1998},
-         {"title":"Ice age","Year":2012}]
+#movies = [{"title":"","Year":0},
+       #  {"title":"Batman","Year":2021},
+       # {"title":"Lion King","Year":1999},
+       # {"title":"Snow White","Year":1998},
+       # {"title":"Ice age","Year":2012}]
 
 
 
 @app.get("/")
 async def root():
-    return {"message": "welcome"}
+    return {"message": "welcome To Precious Edmund Movies API"}
 
 # get all movies
-@app.get("/movies")
+@app.get("/All_movies")
 def get_movies():
     sql = "SELECT * FROM movies"
     mycursor.execute(sql)
     movies = mycursor.fetchall()
     return movies
 
+#get movie by title
+@app.get("/movie_by_title/{movie_title}")
+def get_movie_bt_title(movie_title:str):
+    sql = "SELECT * FROM movies WHERE title = %s"
+    val = (movie_title,)
+    mycursor.execute(sql,val)
+    movie = mycursor.fetchall()
+    return movie
+
 #get single movie
-@app.get("/movie/{movie_id}")
+@app.get("/movie_by_id/{movie_id}")
 def get_movie(movie_id:int):
     sql = "SELECT * FROM movies WHERE id = %s"
     val = (movie_id,)
@@ -43,18 +53,18 @@ def get_movie(movie_id:int):
 
 #creating a new movie
 @app.post("/create_movie")
-def create_movie(movie:dict):
+def create_movie(movie:Movie):
     sql = "INSERT INTO movies (title,Year,storyline) VALUES (%s,%s,%s)"
-    val = (movie['title'],movie['Year'],movie['storyline'])
+    val = (movie.title, movie.Year, movie.storyline)
     mycursor.execute(sql,val)
     mydb.commit()
-    return movie
+    return movie_title
 
 #updating a movie (renaming or fixing the year of an existing movie)
 @app.post("/update_movie")
-def update_movies(movie:dict):
+def update_movies(movie:Movie,movie_id:int):
     sql = "UPDATE movies SET title = %s , Year = %s, storyline = %s WHERE id = %s"
-    val = (movie['title'],movie['Year'],movie['storyline'], movie['id'])
+    val = (movie.title, movie.Year, movie.storyline, movie.movie_id)
     mycursor.execute(sql,val)
     mydb.commit()
     return movie
