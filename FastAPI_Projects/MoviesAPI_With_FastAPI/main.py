@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import mysql.connector
 from fastapi.openapi.models import Response
 from pydantic import BaseModel
@@ -40,7 +40,9 @@ def get_movie_bt_title(movie_title:str):
     val = (movie_title,)
     mycursor.execute(sql,val)
     movie = mycursor.fetchall()
-    return movie
+    if len(movie) == 0:
+        raise HTTPException(status_code=500,details="Movie not found😒")
+    return movie[0]
 
 #get single movie
 @app.get("/movie_by_id/{movie_id}")
