@@ -8,5 +8,5 @@
 - [x] Install ASGI server, for production such as Uvicorn or Hypercorn using this below code:
    ` pip install "uvicorn[standard]" `
 
-![Alt text](https://Users\Precious Edmund\Precious\SimpleCrudAPI\FastAPI_Projects\Todo_with_FastAPI\Images\APIlist.jpg)
+![Alt text](https://github.com/PreciousEddy/SimpleCrudAPI/blob/main/FastAPI_Projects/Todo_with_FastAPI/Images/APIlist.jpg)
 
